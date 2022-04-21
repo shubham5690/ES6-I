@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #query{
+            width:200px
+        }
+        #movies{
+            border:1px solid black;
+            height: 200px;
+            width:206px;
+            border-top: none;
+            overflow: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hotstar</h1>
+    <!-- /1. oninput='searchMovies' 2. instead of searchMovies() we put on main() 3.now replace it debouncing -->
+    <input oninput="debounce(main,1000)" type="text" id="query"/>  
+    <div id="movies"></div>
+</body>
+</html>
+<script>
+//https://www.omdbapi.com/?apikey=6a41ddca&s=om_shanti_om
+     let movies_div=document.getElementById('movies')
+     let id;
+    async function searchMovies(){
+
+        try{
+            const query= document.getElementById('query').value
+       const res= await fetch(`https://www.omdbapi.com/?apikey=6a41ddca&s=${query}`)
+       const data= await res.json();
+       const movies=data.Search;
+    //    appendMovies(movies)
+    //    console.log(data)
+       return movies;
+
+        }catch(err){
+            console.log(err)
+        }   
+    }
+
+    function appendMovies(data){
+        //1.optimaztion use if so if data is not present it will not show
+        // if(data===undefined){
+        //     return false;
+        // }
+        //2 optimization getting a new result or update the search result by using 'null' and skip the previous data
+        movies_div.innerHTML=null;
+        data.forEach(function(ele){
+            let p=document.createElement('p')
+            p.innerText=ele.Title;
+
+            movies_div.append(p);
+
+        })
+
+    }
+
+    //we will assemble them in one function
+
+    async function main(){
+        let data= await searchMovies();
+        // console.log(data)
+        if(data===undefined){
+            return false;
+        }
+        appendMovies(data)
+
+    }
+
+    //3. debouncing---- function debounce(function that you want to debounce like main(),delay(timing))
+   function debounce(func,delay){
+       if(id){
+           clearTimeout(id)
+       }
+       id =setTimeout(function(){
+           func();
+       },delay)
+   }
+
+
+</script>
